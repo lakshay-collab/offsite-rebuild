@@ -1,0 +1,28 @@
+# Dependencies and build output (recreated by `yarn install` / `yarn build`)
+node_modules/
+frontend/build/
+frontend/.cache/
+
+# Secrets: never commit real environment files. Copy backend/.env.example to backend/.env instead.
+backend/.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.claude/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

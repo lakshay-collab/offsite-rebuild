@@ -1,0 +1,618 @@
+﻿/* Type system shared with hi.tours: Bricolage Grotesque (headings), Instrument Sans (sub-heads), Inter (body).
+   The font stylesheet is linked from public/index.html. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===== Design tokens: one set of values for radius, motion, borders and shadow ===== */
+:root {
+    --hi-ease: cubic-bezier(0.22, 1, 0.36, 1); /* the site's one easing curve */
+    --hi-dur-fast: 280ms; /* fast interaction: hover colour/underline/arrow (200-300) */
+    --hi-dur: 450ms; /* normal UI: cards, lifts (350-500) */
+    --hi-dur-slow: 600ms; /* image zoom */
+    --hi-dur-editorial: 750ms; /* editorial reveals (600-900) */
+    --hi-dur-cinematic: 1050ms; /* cinematic reveals (900-1200) */
+    --hi-radius: 20px; /* cards and panels */
+    --hi-radius-sm: 14px; /* chips, rows, inputs */
+    --hi-border: rgba(0, 33, 49, 0.08);
+    --hi-gold-line: rgba(201, 160, 97, 0.28);
+    --hi-shadow: 0 1px 2px rgba(0, 33, 49, 0.04), 0 12px 32px rgba(0, 33, 49, 0.07);
+    --hi-shadow-hover: 0 2px 4px rgba(0, 33, 49, 0.05), 0 18px 44px rgba(0, 33, 49, 0.12);
+}
+
+/* One text colour across the site: #002131 on light backgrounds, white on dark/photo backgrounds. */
+body {
+    margin: 0;
+    font-family: Inter, "Instrument Sans", Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.65;
+    letter-spacing: 0.005em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    color: #002131;
+    background: #fbf9f1;
+}
+
+::selection { background: #fb7f26; color: #fff; }
+
+/* Typography: balanced headings (no lonely last word), tidy paragraph endings */
+h1, h2, h3 { text-wrap: balance; }
+p, li, blockquote { text-wrap: pretty; }
+
+/* Keyboard focus: a visible, restrained ring (mouse clicks don't show it) */
+:focus-visible { outline: 2px solid rgba(251, 127, 38, 0.85); outline-offset: 3px; border-radius: 6px; }
+a:focus-visible, button:focus-visible, [role="tab"]:focus-visible, summary:focus-visible { outline-offset: 4px; }
+.hi-btn:focus-visible, button.rounded-full:focus-visible, a.rounded-full:focus-visible { border-radius: 999px; }
+
+/* Form fields: border and ring react gently on focus (the proposal form carries its own gold focus style) */
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+    transition: border-color var(--hi-dur-fast) var(--hi-ease), box-shadow var(--hi-dur-fast) var(--hi-ease), background-color var(--hi-dur-fast) var(--hi-ease);
+}
+/* email fields embedded in a pill (footer, final CTA) have no border of their own: ring the pill instead */
+div:has(> input.bg-transparent:focus-visible) {
+    outline: 2px solid rgba(251, 127, 38, 0.55);
+    outline-offset: 2px;
+    transition: outline-color var(--hi-dur-fast) var(--hi-ease);
+}
+
+/* Photos: a warm placeholder while they load, so nothing flashes white */
+img[loading="lazy"] { background-color: #efe9dc; }
+
+/* Neighbouring light sections drift between ivory tones instead of reading as separate rectangles */
+main > section.bg-hi-surface:nth-of-type(even) {
+    background-image: linear-gradient(180deg, #fbf9f1 0%, #f8f4e9 45%, #fbf9f1 100%);
+}
+
+/* ===== HI Offsite design system (hi.tours language) ===== */
+/* In the components layer so Tailwind utilities can override. */
+@layer components {
+.hi-container {
+    width: 100%;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+@media (min-width: 768px) {
+    .hi-container { padding-left: 32px; padding-right: 32px; }
+}
+
+/* Headings (hi.tours h1/h2): confident, editorial — medium weight, tight tracking */
+.hi-display {
+    font-family: "Bricolage Grotesque", Inter, sans-serif;
+    font-weight: 500;
+    font-optical-sizing: auto;
+    letter-spacing: -0.025em;
+    line-height: 1.08;
+}
+.hi-display em { font-style: normal; color: inherit; }
+
+/* Sub-headings (hi.tours h3) */
+.hi-title {
+    font-family: "Instrument Sans", Inter, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.28;
+}
+
+/* Cards: white, a 1px hairline and a very soft navy-tinted shadow */
+.hi-card {
+    background: #fff;
+    border-radius: var(--hi-radius);
+    box-shadow: 0 0 0 1px var(--hi-border), var(--hi-shadow);
+}
+/* Hover lift: 4px, shadow deepens slightly (350-500ms, one easing curve) */
+.hi-lift { transition: transform var(--hi-dur) var(--hi-ease), box-shadow var(--hi-dur) var(--hi-ease); }
+.hi-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0 0 1px var(--hi-border), var(--hi-shadow-hover);
+}
+
+/* Frosted glass */
+.hi-glass {
+    background: rgba(255, 255, 255, 0.78);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    backdrop-filter: blur(18px) saturate(1.4);
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6), 0 10px 34px rgba(0, 33, 49, 0.16);
+}
+/* Nav capsule: barely-there tint, mostly blur */
+.hi-glass-nav {
+    background: rgba(255, 255, 255, 0.18);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6);
+    backdrop-filter: blur(18px) saturate(1.6);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3), 0 10px 30px rgba(0, 33, 49, 0.12);
+    transition: background-color 500ms var(--hi-ease), box-shadow 500ms var(--hi-ease);
+}
+/* After the hero the text turns navy, so a touch more frost keeps it readable over photos and dark bands */
+.hi-glass-nav.on-light { background: rgba(255, 255, 255, 0.45); }
+.hi-glass-dark {
+    background: rgba(255, 255, 255, 0.12);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.28);
+}
+
+/* Hero planner bar */
+.hi-planner-ring {
+    background: rgba(255, 255, 255, 0.04);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2), 0 20px 50px rgba(0, 10, 20, 0.25);
+}
+/* Glowing 1px rim drawn as a masked ring, so it doesn't show through the see-through body */
+.hi-planner-rim { position: relative; }
+.hi-planner-rim::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    /* warm glow at the ends, cool silver across the middle */
+    background: linear-gradient(90deg, rgba(251, 160, 80, 0.9), rgba(255, 255, 255, 0.4) 22%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.4) 78%, rgba(251, 160, 80, 0.9));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+    pointer-events: none;
+}
+/* Very light frosted body: mostly see-through, gentle blur */
+.hi-planner {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.06));
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    backdrop-filter: blur(10px) saturate(1.2);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.hi-planner-cta {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #002131;
+    white-space: nowrap;
+    /* frosted translucent white: the photo shows through, subtle top sheen, soft lift */
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.76));
+    -webkit-backdrop-filter: blur(10px) saturate(1.2);
+    backdrop-filter: blur(10px) saturate(1.2);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.7),
+        inset 0 -1px 2px rgba(0, 33, 49, 0.08),
+        0 8px 22px rgba(0, 10, 20, 0.25);
+    transition: transform 0.25s ease, box-shadow 0.3s ease, background 0.3s ease;
+}
+.hi-planner-cta:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.86));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.85),
+        inset 0 -1px 2px rgba(0, 33, 49, 0.08),
+        0 14px 32px rgba(0, 10, 20, 0.32);
+}
+
+/* Champagne stats panel */
+.hi-champagne {
+    background:
+        radial-gradient(ellipse 70% 60% at 50% 0%, #fffaf1 0%, rgba(255, 250, 241, 0) 70%),
+        linear-gradient(180deg, #f7efe2 0%, #f1e4d0 100%);
+}
+.hi-gold-frame {
+    padding: 6px;
+    background: linear-gradient(135deg, #f3dfb8, #c9a061 45%, #f6e7c8 70%, #b8873f);
+    box-shadow: 0 0 0 10px rgba(255, 250, 241, 0.55), 0 0 0 11px rgba(201, 160, 97, 0.45), 0 20px 50px rgba(120, 90, 40, 0.2);
+}
+/* a soft light sweep across a portrait frame on hover (parent needs .group + overflow hidden) */
+.hi-shimmer { transition: box-shadow 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.hi-shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 246, 225, 0.55) 50%, transparent 65%);
+    transform: translateX(-120%);
+}
+.group:hover .hi-shimmer::after { transition: transform 1.3s cubic-bezier(0.2, 0.8, 0.2, 1); transform: translateX(120%); }
+.group:hover .hi-shimmer { transform: translateY(-4px); }
+.hi-cream-card {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.78), rgba(255, 249, 238, 0.5));
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        0 0 0 1px rgba(201, 160, 97, 0.28),
+        0 22px 50px rgba(120, 90, 40, 0.12);
+}
+.hi-cream-card.hi-lift:hover {
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        0 0 0 1px rgba(201, 160, 97, 0.5),
+        0 30px 60px rgba(120, 90, 40, 0.18);
+}
+.hi-gold-chip {
+    background: linear-gradient(160deg, #ffffff, #f6ecdc);
+    box-shadow: 0 0 0 1px rgba(201, 160, 97, 0.7), 0 0 0 4px rgba(255, 250, 241, 0.8), 0 0 0 5px rgba(201, 160, 97, 0.25), 0 8px 18px rgba(120, 90, 40, 0.15);
+}
+
+/* Polaroid photo tile: white mat, gold rim, soft shadow */
+.hi-polaroid {
+    padding: 6px;
+    border-radius: 10px;
+    background: #fffdf8;
+    box-shadow:
+        0 0 0 1.5px #d9b779,
+        0 0 0 3px rgba(255, 250, 238, 0.9),
+        0 0 0 4px rgba(201, 160, 97, 0.35),
+        0 14px 30px rgba(80, 55, 20, 0.22);
+    transform: rotate(var(--tilt, 0deg));
+    transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.5s ease;
+}
+/* on hover the photo straightens, lifts and comes to the front */
+.hi-polaroid:hover {
+    z-index: 10;
+    transform: rotate(0deg) translateY(-8px) scale(1.08);
+    box-shadow:
+        0 0 0 1.5px #c9a061,
+        0 0 0 3px rgba(255, 250, 238, 0.95),
+        0 0 0 4px rgba(201, 160, 97, 0.5),
+        0 26px 50px rgba(80, 55, 20, 0.32);
+}
+/* Light frosted pill inside a gold rim (proof badge) */
+.hi-gold-rim {
+    background: linear-gradient(135deg, #f3dfb8, #c9a061 35%, #f6e7c8 60%, #b8873f);
+    box-shadow: 0 16px 40px rgba(120, 90, 40, 0.18);
+}
+.hi-frost-pill {
+    background: linear-gradient(160deg, rgba(255, 255, 255, 0.82), rgba(255, 248, 236, 0.6));
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* GSAP step card face: champagne cream */
+.hi-step-face {
+    background:
+        radial-gradient(ellipse 80% 70% at 100% 0%, #fffaf1 0%, rgba(255, 250, 241, 0) 70%),
+        linear-gradient(160deg, #fbf6ec, #f3e8d6);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+.hi-step-card { box-shadow: 0 30px 70px rgba(80, 55, 20, 0.18); }
+
+/* Navy corner shape with a gold edge */
+.hi-corner-sweep {
+    background: linear-gradient(135deg, #0a2a3c, #002131);
+    box-shadow: 0 0 0 3px #c9a061, 0 0 0 9px rgba(255, 250, 241, 0.6), 0 0 0 10px rgba(201, 160, 97, 0.4);
+}
+
+/* Navy gradients */
+.hi-navy-grad { background: linear-gradient(90deg, #002131, #113141 50%, #174358); }
+.hi-navy-grad-v { background: linear-gradient(180deg, #1f5673, #174358 55%, #0e3346); }
+
+/* Buttons: tactile pills with inset highlight */
+.hi-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border-radius: 999px;
+    padding: 7px 7px 7px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0;
+    white-space: nowrap;
+    transition: transform var(--hi-dur-fast) var(--hi-ease), box-shadow 300ms var(--hi-ease), background-color 300ms var(--hi-ease), filter 300ms var(--hi-ease);
+}
+.hi-btn:hover { transform: translateY(-1px); }
+.hi-btn:active { transform: translateY(0); }
+.hi-btn .hi-btn-icon {
+    display: inline-flex;
+    height: 40px;
+    width: 40px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+}
+/* the arrow itself moves (3-4px) rather than the whole chip spinning */
+.hi-btn .hi-btn-icon svg { transition: transform 300ms var(--hi-ease); }
+.hi-btn:hover .hi-btn-icon svg { transform: translate(3px, -3px); }
+.hi-btn-arrow-right:hover .hi-btn-icon svg { transform: translateX(4px); }
+.hi-btn-primary {
+    background: linear-gradient(90deg, #fb7f26, #e75e26);
+    color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 10px 26px rgba(231, 94, 38, 0.35);
+}
+.hi-btn-primary:hover { filter: brightness(1.05); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 16px 34px rgba(231, 94, 38, 0.45); }
+.hi-btn-primary .hi-btn-icon { background: rgba(255, 255, 255, 0.22); color: #fff; box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35); }
+.hi-btn-navy {
+    background: #174358;
+    color: #fff;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), inset 0 -1px 0 rgba(0, 0, 0, 0.18), 0 10px 26px rgba(0, 33, 49, 0.28);
+}
+.hi-btn-navy .hi-btn-icon { background: rgba(255, 255, 255, 0.14); color: #fff; }
+.hi-btn-glass {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+.hi-btn-glass .hi-btn-icon { background: #fff; color: #002131; }
+.hi-btn-white {
+    background: #fff;
+    color: #002131;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05), 0 8px 22px rgba(0, 33, 49, 0.12);
+}
+.hi-btn-white .hi-btn-icon { background: #174358; color: #fff; }
+
+.hi-link {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 350ms var(--hi-ease);
+}
+.hi-link:hover { background-size: 100% 1px; }
+/* parent .group hover also draws the underline, so card/row links react as a whole */
+.group:hover .hi-link { background-size: 100% 1px; }
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes hi-marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+.hi-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: hi-marquee 60s linear infinite;
+}
+.hi-marquee-track.reverse { animation-direction: reverse; }
+.hi-marquee-track.fast { animation-duration: 40s; }
+.hi-marquee-mask {
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+@keyframes hi-fade-down {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.hi-fade-down { animation: hi-fade-down 250ms var(--hi-ease) backwards; }
+
+/* Menus: container fades in, drops 10px and settles from 0.985 (350ms); inside, the columns follow one after another */
+@keyframes hi-menu-in {
+    from { opacity: 0; transform: translateY(-10px) scale(0.985); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.hi-menu-in { transform-origin: 50% 0; animation: hi-menu-in 350ms var(--hi-ease) backwards; }
+@keyframes hi-menu-col {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.hi-menu-col { animation: hi-menu-col 420ms var(--hi-ease) backwards; animation-delay: calc(var(--i, 0) * 50ms + 80ms); }
+
+/* Navbar: fades in and settles down from 12px on first load */
+@keyframes hi-nav-in {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.hi-nav-in { animation: hi-nav-in 700ms var(--hi-ease) 150ms backwards; }
+
+/* Page change: the incoming page eases in (opacity + 10px). Enter-only, so navigation is never delayed. */
+@keyframes hi-page-in {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: none; }
+}
+.hi-page-in { animation: hi-page-in 380ms var(--hi-ease) backwards; }
+
+/* Living arrows: on hover an arrow glides 4px along its direction, then settles. Hover-only, no looping. */
+a svg.lucide-arrow-up-right:not([class*="translate"]):not([class*="rotate"]),
+button svg.lucide-arrow-up-right:not([class*="translate"]):not([class*="rotate"]),
+a svg.lucide-arrow-right:not([class*="translate"]):not([class*="rotate"]),
+button svg.lucide-arrow-right:not([class*="translate"]):not([class*="rotate"]) {
+    transition: transform var(--hi-dur-fast) var(--hi-ease);
+}
+@media (hover: hover) {
+    a:hover svg.lucide-arrow-up-right:not([class*="translate"]):not([class*="rotate"]),
+    button:hover svg.lucide-arrow-up-right:not([class*="translate"]):not([class*="rotate"]) { transform: translate(4px, -4px); }
+    a:hover svg.lucide-arrow-right:not([class*="translate"]):not([class*="rotate"]),
+    button:hover svg.lucide-arrow-right:not([class*="translate"]):not([class*="rotate"]) { transform: translateX(4px); }
+}
+
+/* Magnetic CTA: the arrow chip leans slightly further than the button (set from useMagnetic) */
+.hi-magnetic .hi-btn-icon { transform: translate3d(var(--ax, 0px), var(--ay, 0px), 0); transition: transform 300ms var(--hi-ease); }
+
+/* Cards with a photo: it zooms 1.04 and (desktop) drifts a few px toward the cursor, inside its own clip */
+.hi-pimg {
+    transform: translate3d(var(--px, 0px), var(--py, 0px), 0) scale(var(--ps, 1));
+    transition: transform 600ms var(--hi-ease);
+}
+/* Promote to a GPU layer only while hovering, so at rest the photo rasterizes
+   at full device-pixel resolution and stays crisp (no idle will-change). */
+.group:hover .hi-pimg { --ps: 1.04; will-change: transform; }
+
+/* Marquee moment: outlined type that stays quiet */
+.hi-outline-text { color: transparent; -webkit-text-stroke: 1px rgba(0, 33, 49, 0.2); }
+
+@keyframes hi-fade-up {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+/* backwards fill: once finished, the element's own transform (hover lift, offsets) applies again */
+.hi-fade-up { animation: hi-fade-up 550ms var(--hi-ease) backwards; }
+
+/* Slow Ken Burns drift for hero media */
+@keyframes hi-kenburns {
+    from { transform: scale(1.08); }
+    to { transform: scale(1); }
+}
+.hi-kenburns { animation: hi-kenburns 14s ease-out both; }
+
+/* Soft pulsing dot */
+@keyframes hi-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(251, 127, 38, 0.55); }
+    50% { box-shadow: 0 0 0 8px rgba(251, 127, 38, 0); }
+}
+.hi-pulse { animation: hi-pulse 2.2s ease-in-out infinite; }
+
+.hi-faq-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s ease;
+}
+.hi-faq-body.open { grid-template-rows: 1fr; }
+.hi-faq-body > div { overflow: hidden; }
+
+/* WhatsApp button: a soft ring that pulses out every few seconds */
+@keyframes hi-wa-ping { 0% { transform: scale(1); opacity: 0.45; } 70%, 100% { transform: scale(1.7); opacity: 0; } }
+.hi-wa-ping { animation: hi-wa-ping 2.8s cubic-bezier(0, 0, 0.2, 1) infinite; }
+@media (prefers-reduced-motion: reduce) { .hi-wa-ping { animation: none; opacity: 0; } }
+
+/* Article typography (blog posts, case studies, legal) — editorial, one ink colour, gold accents */
+.hi-prose { color: #002131; font-size: 17px; line-height: 1.8; }
+.hi-prose > * + * { margin-top: 1.1em; }
+.hi-prose h2, .hi-prose h3, .hi-prose h4, .hi-prose h5 { font-family: "Bricolage Grotesque", sans-serif; color: #002131; line-height: 1.2; letter-spacing: -0.01em; }
+.hi-prose h2 { font-size: clamp(26px, 2.4vw, 34px); margin-top: 2em; }
+.hi-prose h3 { font-size: clamp(21px, 1.8vw, 25px); margin-top: 1.7em; }
+.hi-prose h4, .hi-prose h5 { font-size: 19px; margin-top: 1.5em; }
+.hi-prose h2 + *, .hi-prose h3 + *, .hi-prose h4 + * { margin-top: 0.6em; }
+.hi-prose a { color: #174358; text-decoration: underline; text-decoration-color: #c9a061; text-underline-offset: 3px; text-decoration-thickness: 1.5px; transition: color 0.2s; }
+.hi-prose a:hover { color: #b8873f; }
+.hi-prose strong, .hi-prose b { font-weight: 650; }
+.hi-prose ul, .hi-prose ol { padding-left: 1.3em; }
+.hi-prose ul { list-style: none; }
+.hi-prose ul > li { position: relative; }
+.hi-prose ul > li::before { content: ""; position: absolute; left: -1.05em; top: 0.75em; width: 6px; height: 6px; border-radius: 9999px; background: linear-gradient(135deg, #e2c08a, #b8873f); }
+.hi-prose ol { list-style: decimal; }
+.hi-prose ol > li::marker { color: #b8873f; font-weight: 600; }
+.hi-prose li + li { margin-top: 0.45em; }
+.hi-prose img { width: 100%; height: auto; border-radius: 22px; margin-top: 1.6em; box-shadow: 0 20px 50px rgba(0, 33, 49, 0.12); }
+.hi-prose figcaption { font-size: 14px; text-align: center; margin-top: 0.6em; }
+.hi-prose blockquote { border-left: 2px solid #c9a061; padding: 0.2em 0 0.2em 1.4em; font-family: "Instrument Sans", sans-serif; font-size: 20px; line-height: 1.5; }
+.hi-prose hr { border: 0; height: 1px; background: linear-gradient(90deg, transparent, #c9a061, transparent); margin: 2.4em 0; }
+.hi-prose table { width: 100%; border-collapse: collapse; font-size: 15px; display: block; overflow-x: auto; }
+.hi-prose th, .hi-prose td { border-bottom: 1px solid rgba(201, 160, 97, 0.35); padding: 0.7em 0.9em; text-align: left; vertical-align: top; }
+.hi-prose th { font-weight: 600; background: rgba(240, 228, 208, 0.45); }
+
+/* Soft light ray: an elliptical gradient instead of a 64px blur filter (same look, no expensive filter repaint while scrolling) */
+.hi-ray { background: radial-gradient(ellipse 50% 50% at 50% 50%, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.28) 45%, rgba(255, 255, 255, 0) 72%); }
+.hi-ray-40 { opacity: 0.8; }
+.hi-ray-55 { opacity: 1.1; }
+
+/* Lenis smooth scrolling: it owns the easing, so native smooth-scroll must not stack on top of it */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+html, body { overflow-x: clip; }
+
+@media (prefers-reduced-motion: reduce) {
+    .hi-marquee-track, .hi-fade-down, .hi-fade-up, .hi-menu-in, .hi-menu-col, .hi-nav-in, .hi-page-in, .hi-kenburns, .hi-pulse { animation: none; }
+    html { scroll-behavior: auto !important; }
+}
+
+code {
+    font-family:
+        source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+@layer base {
+    :root {
+        --background: 48 52% 96%;
+        --foreground: 200 100% 10%;
+        --card: 0 0% 100%;
+        --card-foreground: 0 0% 3.9%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 0 0% 3.9%;
+        --primary: 0 0% 9%;
+        --primary-foreground: 0 0% 98%;
+        --secondary: 0 0% 96.1%;
+        --secondary-foreground: 0 0% 9%;
+        --muted: 0 0% 96.1%;
+        --muted-foreground: 0 0% 45.1%;
+        --accent: 0 0% 96.1%;
+        --accent-foreground: 0 0% 9%;
+        --destructive: 0 84.2% 60.2%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 0 0% 89.8%;
+        --input: 0 0% 89.8%;
+        --ring: 0 0% 3.9%;
+        --chart-1: 12 76% 61%;
+        --chart-2: 173 58% 39%;
+        --chart-3: 197 37% 24%;
+        --chart-4: 43 74% 66%;
+        --chart-5: 27 87% 67%;
+        --radius: 0.5rem;
+    }
+    .dark {
+        --background: 0 0% 3.9%;
+        --foreground: 0 0% 98%;
+        --card: 0 0% 3.9%;
+        --card-foreground: 0 0% 98%;
+        --popover: 0 0% 3.9%;
+        --popover-foreground: 0 0% 98%;
+        --primary: 0 0% 98%;
+        --primary-foreground: 0 0% 9%;
+        --secondary: 0 0% 14.9%;
+        --secondary-foreground: 0 0% 98%;
+        --muted: 0 0% 14.9%;
+        --muted-foreground: 0 0% 63.9%;
+        --accent: 0 0% 14.9%;
+        --accent-foreground: 0 0% 98%;
+        --destructive: 0 62.8% 30.6%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 0 0% 14.9%;
+        --input: 0 0% 14.9%;
+        --ring: 0 0% 83.1%;
+        --chart-1: 220 70% 50%;
+        --chart-2: 160 60% 45%;
+        --chart-3: 30 80% 55%;
+        --chart-4: 280 65% 60%;
+        --chart-5: 340 75% 55%;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+    }
+}
+
+@layer base {
+    [data-debug-wrapper="true"] {
+        display: contents !important;
+    }
+
+    [data-debug-wrapper="true"] > * {
+        margin-left: inherit;
+        margin-right: inherit;
+        margin-top: inherit;
+        margin-bottom: inherit;
+        padding-left: inherit;
+        padding-right: inherit;
+        padding-top: inherit;
+        padding-bottom: inherit;
+        column-gap: inherit;
+        row-gap: inherit;
+        gap: inherit;
+        border-left-width: inherit;
+        border-right-width: inherit;
+        border-top-width: inherit;
+        border-bottom-width: inherit;
+        border-left-style: inherit;
+        border-right-style: inherit;
+        border-top-style: inherit;
+        border-bottom-style: inherit;
+        border-left-color: inherit;
+        border-right-color: inherit;
+        border-top-color: inherit;
+        border-bottom-color: inherit;
+    }
+}
